@@ -5,7 +5,7 @@ set -Eeuo pipefail
 # deploy.local.sh 已加入 .gitignore，不要上传到公开仓库。
 SOPT="3223"
 UUID="CHANGE_ME_BEFORE_USE"
-INSTALL_URL="https://raw.githubusercontent.com/OWNER/REPO/COMMIT/socks5-only/install.sh"
+INSTALL_URL="https://raw.githubusercontent.com/OWNER/REPO/COMMIT/install.sh"
 
 if [[ ${INSTALL_URL} == *"OWNER/REPO"* ]]; then
   echo "请先把 INSTALL_URL 改成你自己的固定 commit 地址" >&2

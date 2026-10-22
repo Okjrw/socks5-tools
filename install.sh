@@ -52,7 +52,7 @@ usage() {
   sudo ./install.sh --port 23456 --allow-cidr 203.0.113.0/24 --udp
 
 兼容 argosbx 环境变量：
-  sopt="3223" uuid="自定义账号密码" sudo -E bash install.sh
+  sopt="3223" uuid="ReplaceWithStrongPassword123" sudo -E bash install.sh
 EOF
 }
 
@@ -114,6 +114,9 @@ source /etc/os-release
 [[ ${VERSION_ID:-} == "24.04" ]] || die "此安装包仅针对 Ubuntu 24.04，当前为 ${VERSION_ID:-未知}"
 [[ $(uname -m) == "x86_64" ]] || die "此安装包仅针对 x86_64"
 command -v systemctl >/dev/null 2>&1 || die "系统未使用 systemd"
+[[ -d /run/systemd/system ]] || die "当前系统没有运行中的 systemd（LXC/OpenVZ 容器请勿使用此安装包）"
+[[ -r /proc/1/comm && $(< /proc/1/comm) == "systemd" ]] \
+  || die "PID 1 不是 systemd（LXC/OpenVZ 容器请勿使用此安装包）"
 
 missing_deps=0
 for cmd in curl unzip sha256sum openssl ss install; do
@@ -121,6 +124,9 @@ for cmd in curl unzip sha256sum openssl ss install; do
     missing_deps=1
   fi
 done
+if [[ ! -s /etc/ssl/certs/ca-certificates.crt ]]; then
+  missing_deps=1
+fi
 
 if (( missing_deps )); then
   info "安装基础依赖"
@@ -262,7 +268,7 @@ for cidr in "${ALLOW_LIST[@]}"; do
   CIDR_JSON+="${CIDR_JSON:+,}\"${cidr}\""
 done
 
-BLOCK_IPS='["0.0.0.0/8","10.0.0.0/8","100.64.0.0/10","127.0.0.0/8","169.254.0.0/16","172.16.0.0/12","192.168.0.0/16","198.18.0.0/15","::1/128","fc00::/7","fe80::/10","ff00::/8"]'
+BLOCK_IPS='["0.0.0.0/8","10.0.0.0/8","100.64.0.0/10","127.0.0.0/8","169.254.0.0/16","172.16.0.0/12","192.168.0.0/16","198.18.0.0/15","224.0.0.0/4","240.0.0.0/4","::/128","::1/128","fc00::/7","fe80::/10","ff00::/8"]'
 
 if [[ -n ${CIDR_JSON} ]]; then
   ROUTING_RULES="      {

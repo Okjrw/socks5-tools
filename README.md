@@ -45,7 +45,7 @@ sudo ./install.sh --port 23456 --allow-cidr 203.0.113.0/24 --udp
 ```bash
 sudo ./install.sh --port 23456 \
   --username socksuser \
-  --password '替换成至少12位随机密码'
+  --password 'ReplaceWithStrongPassword123'
 ```
 
 安装完成后会输出客户端参数。使用 `--force` 重装时，旧配置和 unit 会备份到 `/var/backups/xray-socks5`。
@@ -55,8 +55,8 @@ sudo ./install.sh --port 23456 \
 将 `install.sh` 上传到可公开访问的地址后，可以保持和 `argosbx` 类似的一行式安装：
 
 ```bash
-sopt="3223" uuid="自定义账号密码" \
-  bash <(curl -fLsS https://raw.githubusercontent.com/OWNER/REPO/COMMIT/socks5-only/install.sh)
+sopt="3223" uuid="ReplaceWithStrongPassword123" \
+  bash <(curl -fLsS https://raw.githubusercontent.com/OWNER/REPO/COMMIT/install.sh)
 ```
 
 - `sopt`：SOCKS5 端口
@@ -66,6 +66,22 @@ sopt="3223" uuid="自定义账号密码" \
 
 这条命令只负责安装 SOCKS5，不会自动修改云厂商安全组或 UFW。端口仍需按下面的防火墙说明放行。
 
+### 最小 VPS 前置依赖
+
+一键命令本身需要 `curl` 和 CA 证书。全新最小化 Ubuntu 24.04 如果缺少它们，先执行：
+
+```bash
+apt-get update
+apt-get install -y --no-install-recommends ca-certificates curl
+```
+
+如果 VPS 没有 `curl` 但有 `wget`，也可以先用 wget 执行安装脚本；脚本运行后会自动补齐其余依赖：
+
+```bash
+sopt="3223" uuid="ReplaceWithStrongPassword123" \
+  bash <(wget -qO- https://raw.githubusercontent.com/OWNER/REPO/COMMIT/install.sh)
+```
+
 ## 修改 sopt 和 uuid
 
 `sopt` 和 `uuid` 是安装时传入的环境变量，不保存在 VPS 的独立配置文件中。可修改的位置有三个：
@@ -73,13 +89,13 @@ sopt="3223" uuid="自定义账号密码" \
 1. 直接改一键命令开头：
 
 ```bash
-sopt="3223" uuid="新的账号密码" bash <(curl -fLsS <install.sh地址>)
+sopt="3223" uuid="ReplaceWithStrongPassword123" bash <(curl -fLsS <install.sh地址>)
 ```
 
 2. 使用私用模板 `deploy.local.example.sh`：复制为 `deploy.local.sh`，修改文件顶部的 `SOPT` 和 `UUID`，之后每次重置 VPS 只需执行：
 
 ```bash
-bash deploy.local.sh --allow-cidr 你的公网IP/32
+bash deploy.local.sh --allow-cidr 203.0.113.10/32
 ```
 
 `deploy.local.sh` 已加入 `.gitignore`，不要上传到公开 GitHub。公开仓库只放 `install.sh`。
@@ -91,8 +107,10 @@ bash deploy.local.sh --allow-cidr 你的公网IP/32
 已经安装但不重置 VPS 时，可以用新参数加 `--force` 重装：
 
 ```bash
-sopt="新端口" uuid="新密码" bash <(curl -fLsS <install.sh地址>) --force
+sopt="3224" uuid="ReplaceWithStrongPassword123" bash <(curl -fLsS <install.sh地址>) --force
 ```
+
+注意：`--allow-cidr` 是 Xray 路由层白名单，不是入口防火墙。它仍允许 TCP 连接和 SOCKS5 认证握手；要真正隐藏端口，必须在 UFW/nftables 和云安全组限制来源。
 
 ## 防火墙
 
