@@ -110,8 +110,11 @@ done
 
 # shellcheck disable=SC1091
 source /etc/os-release
-[[ ${ID:-} == "ubuntu" ]] || die "此安装包仅针对 Ubuntu 24.04"
-[[ ${VERSION_ID:-} == "24.04" ]] || die "此安装包仅针对 Ubuntu 24.04，当前为 ${VERSION_ID:-未知}"
+[[ ${ID:-} == "ubuntu" ]] || die "此安装包仅针对 Ubuntu"
+case "${VERSION_ID:-}" in
+  24.04|26.04) ;;
+  *) die "此安装包支持 Ubuntu 24.04/26.04，当前为 ${VERSION_ID:-未知}" ;;
+esac
 [[ $(uname -m) == "x86_64" ]] || die "此安装包仅针对 x86_64"
 command -v systemctl >/dev/null 2>&1 || die "系统未使用 systemd"
 [[ -d /run/systemd/system ]] || die "当前系统没有运行中的 systemd（LXC/OpenVZ 容器请勿使用此安装包）"

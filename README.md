@@ -1,6 +1,8 @@
-# SOCKS5-only for Ubuntu 24.04
+# SOCKS5-only for Ubuntu 24.04 / 26.04
 
 一个只做 SOCKS5 的最小部署包。相比 `argosbx`，不包含 WARP、Argo、订阅、证书、多协议和 `.bashrc` 注入。
+
+支持 Ubuntu 24.04 和 26.04 x86_64。26.04 已完成静态兼容检查，但尚未在真实 VPS 上做完整安装验证。
 
 ## 组成
 
