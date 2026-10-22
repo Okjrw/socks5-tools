@@ -75,6 +75,15 @@ apt-get update
 apt-get install -y --no-install-recommends ca-certificates curl
 ```
 
+也可以把前置安装和部署合成一条命令：
+
+```bash
+apt-get update && \
+apt-get install -y --no-install-recommends ca-certificates curl && \
+sopt="3223" uuid="ReplaceWithStrongPassword123" \
+  bash <(curl -fLsS https://raw.githubusercontent.com/OWNER/REPO/COMMIT/install.sh)
+```
+
 如果 VPS 没有 `curl` 但有 `wget`，也可以先用 wget 执行安装脚本；脚本运行后会自动补齐其余依赖：
 
 ```bash
